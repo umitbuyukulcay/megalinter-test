@@ -72,7 +72,7 @@
               
               LINTER_RULES_PATH: .github/linters
 
-              C_CLANG_FORMAT_CONFIG_FILE: ".clangformat"
+              C_CLANG_FORMAT_CONFIG_FILE: ".clang-format"
               LATEX_CHKTEX_CONFIG_FILE: ".chktexrc"
 
               C_CLANG_FORMAT_FILTER_REGEX_EXCLUDE: (Stm32_lib)
