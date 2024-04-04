@@ -1,80 +1,74 @@
+name: MegaLinter
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  APPLY_FIXES: none
+  APPLY_FIXES_EVENT: pull_request
+  APPLY_FIXES_MODE: commit
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  megalinter:
     name: MegaLinter
-    
-    on:
-      push:
-    
-      pull_request:
-        branches:
-          - main
-          - master
-    
-    env:
-      APPLY_FIXES: none
-      APPLY_FIXES_EVENT: pull_request
-      APPLY_FIXES_MODE: commit
-    
-    concurrency:
-      group: ${{ github.ref }}-${{ github.workflow }}
-      cancel-in-progress: true
-    
-    jobs:
-      megalinter:
-        name: MegaLinter
-        runs-on: ubuntu-latest
-    
-        permissions:
-          contents: write
-          issues: write
-          pull-requests: write
-    
-        steps:
-    
-          - name: Checkout Code
-            uses: actions/checkout@v4
-            with:
-              token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-    
-              fetch-depth: 0
-    
-          - name: MegaLinter
+    runs-on: ubuntu-latest
 
-            uses: oxsecurity/megalinter@v7
-    
-            id: ml
-    
-            env:
-    
-              # Validates all source when push on main, else just the git diff with
-              # main. Override with true if you always want to lint all sources
-              #
-              # To validate the entire codebase, set to:
-              # VALIDATE_ALL_CODEBASE: true
-              #
-              # To validate only diff with main, set to:
-              # VALIDATE_ALL_CODEBASE: >-
-              #   ${{
-              #     github.event_name == 'push' &&
-              #     contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
-              #   }}
-              VALIDATE_ALL_CODEBASE: >-
-                ${{
-                  github.event_name == 'push' &&
-                  contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
-                }}
-    
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-              # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
 
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
-              ENABLE_LINTERS: MARKDOWN_MARKDOWNLINT,BASH_SHELLCHECK,REPOSITORY_GITLEAKS,PYTHON_BLACK,JSON_ESLINT_PLUGIN_JSONC,C_CLANG_FORMAT,MAKEFILE_CHECKMAKE,JAVASCRIPT_PRETTIER,LATEX_CHKTEX
-    
-              
-              LINTER_RULES_PATH: .github/linters
+          fetch-depth: 0
 
-              C_CLANG_FORMAT_CONFIG_FILE: ".clang-format"
-              LATEX_CHKTEX_CONFIG_FILE: ".chktexrc"
+      - name: MegaLinter
 
-              C_CLANG_FORMAT_FILTER_REGEX_EXCLUDE: (Stm32_lib)
+        uses: oxsecurity/megalinter@v7
 
-              LOG_LEVEL: DEBUG
+        id: ml
+
+        env:
+          # Validates all source when push on main, else just the git diff with
+          # main. Override with true if you always want to lint all sources
+          #
+          # To validate the entire codebase, set to:
+          # VALIDATE_ALL_CODEBASE: true
+          #
+          # To validate only diff with main, set to:
+          # VALIDATE_ALL_CODEBASE: >-
+          #   ${{
+          #     github.event_name == 'push' &&
+          #     contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
+          #   }}
+          VALIDATE_ALL_CODEBASE: >-
+            ${{
+              github.event_name == 'push' &&
+              contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
+            }}
+
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE
+
+          ENABLE_LINTERS: MARKDOWN_MARKDOWNLINT,BASH_SHELLCHECK,REPOSITORY_GITLEAKS,PYTHON_BLACK,JSON_ESLINT_PLUGIN_JSONC,C_CLANG_FORMAT,MAKEFILE_CHECKMAKE,JAVASCRIPT_PRETTIER,LATEX_CHKTEX,YAML_PRETTIER
+
+          LINTER_RULES_PATH: .github/linters
+
+          C_CLANG_FORMAT_CONFIG_FILE: ".clang-format"
+          LATEX_CHKTEX_CONFIG_FILE: ".chktexrc"
+
+          C_CLANG_FORMAT_FILTER_REGEX_EXCLUDE: (Stm32_lib)
+
+          LOG_LEVEL: DEBUG
