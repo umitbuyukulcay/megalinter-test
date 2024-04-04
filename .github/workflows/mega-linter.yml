@@ -95,7 +95,6 @@
               # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE
               # .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
 
-              ENABLE: MARKDOWN
 
               ENABLE_LINTERS: MARKDOWN_MARKDOWNLINT
     
